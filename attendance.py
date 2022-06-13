@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 
 
-path = 'images'
+path = 'data_images'
 images = []
 personNames = []
 myList = os.listdir(path)
@@ -24,26 +24,28 @@ def faceEncodings(images):
         encode = face_recognition.face_encodings(img)[0]
         encodeList.append(encode)
     return encodeList
-print(faceEncodings(images))
 
-def attendance(name):
-    with open('Attendance.csv', 'r+') as f:
+def attendance(id_n, first_n, last_n):
+    time_now = datetime.now()
+    tStr = time_now.strftime('%H:%M:%S')
+    dStr = time_now.strftime('%d/%m/%Y')
+
+    # Working on giving current date as a file name
+    # file_name = f"Attendance G5 {dStr}"
+
+    with open('attendance.csv', 'a+') as f:
         myDataList = f.readlines()
         nameList = []
         for line in myDataList:
             entry = line.split(',')
             nameList.append(entry[0])
         if name not in nameList:
-            time_now = datetime.now()
-            tStr = time_now.strftime('%H:%M:%S')
-            dStr = time_now.strftime('%d/%m/%Y')
-            f.writelines(f'\n  {name},{tStr},{dStr}')
-
+            f.writelines(f'\n  {id_n},{first_n}, {last_n}, {tStr},{dStr}')
 
 encodeListKnown = faceEncodings(images)
 print('All Encodings Complete!!!')
 # if u use laptop put 0 and if webcam put 1
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 while True:
     ret, frame = cap.read()
@@ -61,14 +63,21 @@ while True:
 
         if matches[matchIndex]:
             name = personNames[matchIndex].upper()
-            #print(name)
+            # print(name)
+            # Splitting the name into id,first,last name
+            detail_name = name.split("_")
+            id_no = detail_name[0]
+            first_Name = detail_name[1]
+            last_Name = detail_name[2]
+
+            # print(matchIndex)
             y1, x2, y2, x1 = faceLoc
             y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
             cv2.putText(frame, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
-            attendance(name)
-
+            attendance(id_no, first_Name, last_Name)
+#
     cv2.imshow('Webcam', frame)
     if cv2.waitKey(1) == 13:
         break
