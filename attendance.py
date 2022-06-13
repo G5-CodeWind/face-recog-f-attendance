@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 
 
-path = 'data_images'
+path = 'images'
 images = []
 personNames = []
 myList = os.listdir(path)
@@ -45,7 +45,7 @@ def attendance(id_n, first_n, last_n):
 encodeListKnown = faceEncodings(images)
 print('All Encodings Complete!!!')
 # if u use laptop put 0 and if webcam put 1
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 while True:
     ret, frame = cap.read()
@@ -69,6 +69,12 @@ while True:
             id_no = detail_name[0]
             first_Name = detail_name[1]
             last_Name = detail_name[2]
+        else:
+            name = ('00_Unknown_can not recognize')
+            detail_name = name.split("_")
+            id_no = detail_name[0]
+            first_Name = detail_name[1]
+            last_Name = detail_name[2]
 
             # print(matchIndex)
             y1, x2, y2, x1 = faceLoc
@@ -77,6 +83,9 @@ while True:
             cv2.rectangle(frame, (x1, y2 - 35), (x2, y2), (0, 255, 0), cv2.FILLED)
             cv2.putText(frame, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
             attendance(id_no, first_Name, last_Name)
+
+
+
 #
     cv2.imshow('Webcam', frame)
     if cv2.waitKey(1) == 13:
